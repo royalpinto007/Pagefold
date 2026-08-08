@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a problem.
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: If this is about extraction, the URL matters more than anything else.
+      placeholder: 'https://...'
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: For extraction bugs, say what should have been kept or dropped.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Press Alt+Shift+S
+        3. See ...
+  - type: input
+    id: chrome
+    attributes:
+      label: Chrome version
+      placeholder: 'chrome://version'
+  - type: input
+    id: version
+    attributes:
+      label: Pagefold version
+      placeholder: 'chrome://extensions'
