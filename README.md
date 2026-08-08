@@ -9,6 +9,54 @@ and the extension makes no network requests at all.
 [![Tech](https://img.shields.io/badge/Tech-TypeScript%20%2B%20IndexedDB-8a5a2b.svg)](#how-it-works)
 
 <!-- media:start -->
+
+<p align="center">
+  <img src="docs/media/logo.png" width="96" alt="Pagefold logo">
+</p>
+
+<h3 align="center">Read it later, with no connection.</h3>
+
+<p align="center">
+  <a href="docs/media/demo.mp4">
+    <img src="docs/media/demo-thumbnail.webp" width="640" alt="Watch the Pagefold demo">
+  </a>
+  <br>
+  <a href="docs/media/demo.mp4"><b>Watch the 30 second demo</b></a>
+</p>
+
+## Screenshots
+
+![Your reading, waiting offline.](docs/media/1-list.webp)
+
+<sub>Your reading, waiting offline.</sub>
+
+<details>
+<summary><b>See 3 more</b></summary>
+
+### Reader
+
+![The article, and nothing else.](docs/media/2-reader.webp)
+
+<sub>The article, and nothing else.</sub>
+
+### Search
+
+![Find it by any word in it.](docs/media/3-search.webp)
+
+<sub>Find it by any word in it.</sub>
+
+### Settings
+
+![It leaves only when you export it.](docs/media/4-settings.webp)
+
+<sub>It leaves only when you export it.</sub>
+
+</details>
+
+<sub>Every screenshot is captured from the real extension running in Chrome, not
+mocked up, so they cannot drift from what the product actually does. Regenerate
+them with the tooling in the store-publishing workspace.</sub>
+
 <!-- media:end -->
 
 ## What it does
