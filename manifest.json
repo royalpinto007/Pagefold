@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Pagefold: Offline Reading Archive",
+  "version": "1.0.0",
+  "description": "Save any article and read it offline. Nothing is uploaded, no account, and the extension makes no network requests.",
+  "permissions": ["activeTab", "scripting", "sidePanel", "contextMenus", "storage"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Pagefold"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "save-page": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Save this page to Pagefold"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "optional_host_permissions": ["<all_urls>"]
+}
