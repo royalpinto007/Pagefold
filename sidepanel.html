@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pagefold</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="bar">
+        <div class="brand">
+          <img src="icons/icon-32.png" alt="" width="22" height="22" />
+          <span>Pagefold</span>
+          <span class="count" id="count" aria-live="polite"></span>
+        </div>
+        <div class="bar-actions">
+          <button id="settings-btn" class="icon-btn" aria-label="Settings" title="Settings">
+            ⚙
+          </button>
+        </div>
+      </header>
+
+      <div class="toolbar" id="toolbar">
+        <button id="save-btn" class="primary">Save this page</button>
+        <div class="filters">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search saved articles"
+            aria-label="Search saved articles"
+            autocomplete="off"
+          />
+          <select id="sort" aria-label="Sort order">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="longest">Longest</option>
+            <option value="shortest">Shortest</option>
+          </select>
+          <label class="toggle">
+            <input type="checkbox" id="unread-only" />
+            <span>Unread</span>
+          </label>
+        </div>
+      </div>
+
+      <main id="list" class="list" aria-live="polite"></main>
+
+      <section id="reader" class="reader" hidden>
+        <div class="reader-bar">
+          <button id="back-btn" class="icon-btn" aria-label="Back to list">←</button>
+          <div class="reader-actions">
+            <button id="read-toggle" class="ghost"></button>
+            <a id="open-original" class="ghost" target="_blank" rel="noopener">Original</a>
+            <button id="delete-btn" class="ghost danger">Delete</button>
+          </div>
+        </div>
+        <article id="reader-body" class="reader-body" tabindex="-1"></article>
+      </section>
+
+      <section id="settings" class="settings" hidden>
+        <div class="reader-bar">
+          <button id="settings-back" class="icon-btn" aria-label="Back to list">←</button>
+          <strong>Settings</strong>
+        </div>
+        <div class="settings-body">
+          <p class="muted" id="storage-line"></p>
+          <div class="settings-row">
+            <button id="export-btn" class="ghost">Export backup</button>
+            <button id="import-btn" class="ghost">Import backup</button>
+            <input type="file" id="import-file" accept="application/json" hidden />
+          </div>
+          <button id="clear-btn" class="ghost danger">Delete everything</button>
+          <p class="muted small">
+            Pagefold makes no network requests. Everything you save stays in this browser profile
+            and is never uploaded, so a backup file is the only way to move it.
+          </p>
+        </div>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </div>
+    <script type="module" src="dist/sidepanel.js"></script>
+  </body>
+</html>

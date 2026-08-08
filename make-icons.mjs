@@ -1,0 +1,44 @@
+/**
+ * Generate the icon set from one SVG, so every size comes from the same source
+ * and a tweak cannot leave the 16px and the 128px looking like different marks.
+ *
+ *   node make-icons.mjs
+ */
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Flat fills, no gradients: the only SVG rasteriser available here is
+       ImageMagick's, which silently drops gradient fills to black. A mark that
+       renders correctly everywhere beats one that looks nicer in a browser. -->
+  <rect width="128" height="128" rx="28" fill="#2a2118"/>
+  <!-- A page with its corner turned down: the gesture the product is named for. -->
+  <path d="M34 24h44l20 20v60a6 6 0 0 1-6 6H34a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z" fill="#f7f2e8"/>
+  <path d="M78 24l20 20H84a6 6 0 0 1-6-6V24z" fill="#c9a271"/>
+  <g fill="#b9ad99">
+    <rect x="42" y="58" width="44" height="5" rx="2.5"/>
+    <rect x="42" y="72" width="44" height="5" rx="2.5"/>
+    <rect x="42" y="86" width="28" height="5" rx="2.5"/>
+  </g>
+  <!-- The fold itself, bottom-right, in the accent. -->
+  <path d="M98 88v16a6 6 0 0 1-6 6H76z" fill="#8a5a2b"/>
+  <path d="M98 88L76 110h16a6 6 0 0 0 6-6z" fill="#a9713a"/>
+</svg>`;
+
+fs.mkdirSync('icons', { recursive: true });
+fs.writeFileSync('icons/icon.svg', svg);
+
+for (const size of [16, 32, 48, 128, 512]) {
+  execFileSync('convert', [
+    '-background',
+    'none',
+    '-density',
+    '900',
+    'icons/icon.svg',
+    '-resize',
+    `${size}x${size}`,
+    `icons/icon-${size}.png`,
+  ]);
+  const { size: bytes } = fs.statSync(`icons/icon-${size}.png`);
+  console.log(`icons/icon-${size}.png  ${bytes} B`);
+}
