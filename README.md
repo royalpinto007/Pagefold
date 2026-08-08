@@ -163,6 +163,11 @@ a real Chrome and driving it.
 See [CONTRIBUTING.md](./CONTRIBUTING.md). Good first issues are labelled
 [good first issue](https://github.com/royalpinto007/Pagefold/labels/good%20first%20issue).
 
+## Privacy
+
+No accounts, no analytics, and nothing about you is collected.
+Full policy: <https://privacy.signalizeai.org/pagefold>
+
 ## License
 
 [MIT](./LICENSE)
