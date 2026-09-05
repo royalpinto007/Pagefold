@@ -10,67 +10,184 @@
     <div id="app">
       <header class="bar">
         <div class="brand">
-          <img src="icons/icon-32.png" alt="" width="22" height="22" />
-          <span>Pagefold</span>
+          <span class="brand-icon"
+            ><img src="icons/icon-32.png" alt="" width="22" height="22"
+          /></span>
+          <span class="brand-name">Pagefold</span>
           <span class="count" id="count" aria-live="polite"></span>
         </div>
         <div class="bar-actions">
           <button id="settings-btn" class="icon-btn" aria-label="Settings" title="Settings">
-            ⚙
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M8 5.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path
+                d="M8 1.5v1.7M8 12.8v1.7M1.5 8h1.7M12.8 8h1.7M3.4 3.4l1.2 1.2M11.4 11.4l1.2 1.2M12.6 3.4l-1.2 1.2M4.6 11.4l-1.2 1.2"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
           </button>
         </div>
       </header>
 
       <div class="toolbar" id="toolbar">
-        <button id="save-btn" class="primary">Save this page</button>
+        <button id="save-btn" class="primary">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M8 2v8.5M4.8 7.3 8 10.5l3.2-3.2M2.5 12.5h11V14h-11z"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span class="primary-label">Save this page</span>
+          <kbd class="primary-kbd" title="Keyboard shortcut: Alt+Shift+S">Alt Shift S</kbd>
+        </button>
         <div class="filters">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search saved articles"
-            aria-label="Search saved articles"
-            autocomplete="off"
-          />
-          <select id="sort" aria-label="Sort order">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="longest">Longest</option>
-            <option value="shortest">Shortest</option>
-          </select>
-          <label class="toggle">
-            <input type="checkbox" id="unread-only" />
-            <span>Unread</span>
-          </label>
+          <div class="search-wrap">
+            <svg
+              class="search-icon"
+              width="14"
+              height="14"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6" />
+              <path
+                d="m10.7 10.7 3 3"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search saved articles  ( / )"
+              aria-label="Search saved articles"
+              autocomplete="off"
+            />
+            <button id="search-clear" class="search-clear" aria-label="Clear search" hidden>
+              ×
+            </button>
+          </div>
+          <div class="filters-row">
+            <div class="select-wrap">
+              <select id="sort" aria-label="Sort order">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="longest">Longest</option>
+                <option value="shortest">Shortest</option>
+              </select>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <path
+                  d="m2.5 4 2.5 2.5L7.5 4"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <label class="pill-toggle">
+              <input type="checkbox" id="unread-only" />
+              <span class="pill"><span class="pill-dot" aria-hidden="true"></span>Unread</span>
+            </label>
+          </div>
         </div>
+        <p class="results-meta" id="results-meta" aria-live="polite"></p>
       </div>
 
       <main id="list" class="list" aria-live="polite"></main>
 
-      <section id="reader" class="reader" hidden>
+      <section id="reader" class="reader" hidden aria-label="Article reader">
+        <div class="reader-progress" aria-hidden="true">
+          <span id="reader-progress-fill"></span>
+        </div>
         <div class="reader-bar">
-          <button id="back-btn" class="icon-btn" aria-label="Back to list">←</button>
+          <button id="back-btn" class="icon-btn back" aria-label="Back to list">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M10 3 5 8l5 5"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Library</span>
+          </button>
           <div class="reader-actions">
             <button id="read-toggle" class="ghost"></button>
-            <a id="open-original" class="ghost" target="_blank" rel="noopener">Original</a>
+            <a id="open-original" class="ghost" target="_blank" rel="noopener">Original ↗</a>
             <button id="delete-btn" class="ghost danger">Delete</button>
           </div>
         </div>
         <article id="reader-body" class="reader-body" tabindex="-1"></article>
       </section>
 
-      <section id="settings" class="settings" hidden>
+      <section id="settings" class="settings" hidden aria-label="Settings">
         <div class="reader-bar">
-          <button id="settings-back" class="icon-btn" aria-label="Back to list">←</button>
-          <strong>Settings</strong>
+          <button id="settings-back" class="icon-btn back" aria-label="Back to list">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M10 3 5 8l5 5"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>Library</span>
+          </button>
+          <strong class="panel-title">Settings</strong>
+          <span class="panel-spacer" aria-hidden="true"></span>
         </div>
         <div class="settings-body">
-          <p class="muted" id="storage-line"></p>
+          <div class="storage-card">
+            <div class="storage-top">
+              <strong>Offline archive</strong>
+              <span id="storage-line" class="muted"></span>
+            </div>
+            <div class="meter" aria-hidden="true"><span id="storage-meter"></span></div>
+          </div>
           <div class="settings-row">
-            <button id="export-btn" class="ghost">Export backup</button>
-            <button id="import-btn" class="ghost">Import backup</button>
+            <button id="export-btn" class="ghost">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M8 10.5V2M4.8 5.2 8 2l3.2 3.2M2.5 10v3.5h11V10"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Export backup
+            </button>
+            <button id="import-btn" class="ghost">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M8 2v8.5M4.8 7.3 8 10.5l3.2-3.2M2.5 10v3.5h11V10"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Import backup
+            </button>
             <input type="file" id="import-file" accept="application/json" hidden />
           </div>
-          <button id="clear-btn" class="ghost danger">Delete everything</button>
+          <div class="danger-zone">
+            <button id="clear-btn" class="ghost danger">Delete everything</button>
+          </div>
           <p class="muted small">
             Pagefold makes no network requests. Everything you save stays in this browser profile
             and is never uploaded, so a backup file is the only way to move it.
@@ -78,7 +195,9 @@
         </div>
       </section>
 
-      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="toast" class="toast" role="status" aria-live="polite">
+        <span class="toast-dot" aria-hidden="true"></span><span id="toast-text"></span>
+      </div>
     </div>
     <script type="module" src="dist/sidepanel.js"></script>
   </body>

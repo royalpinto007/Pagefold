@@ -24,10 +24,13 @@ const els = {
   list: $('list'),
   save: $<HTMLButtonElement>('save-btn'),
   search: $<HTMLInputElement>('search'),
+  searchClear: $<HTMLButtonElement>('search-clear'),
+  resultsMeta: $('results-meta'),
   sort: $<HTMLSelectElement>('sort'),
   unreadOnly: $<HTMLInputElement>('unread-only'),
   reader: $('reader'),
   readerBody: $('reader-body'),
+  readerProgress: $('reader-progress-fill'),
   back: $('back-btn'),
   readToggle: $<HTMLButtonElement>('read-toggle'),
   openOriginal: $<HTMLAnchorElement>('open-original'),
@@ -36,11 +39,13 @@ const els = {
   settingsBtn: $('settings-btn'),
   settingsBack: $('settings-back'),
   storageLine: $('storage-line'),
+  storageMeter: $('storage-meter'),
   exportBtn: $('export-btn'),
   importBtn: $('import-btn'),
   importFile: $<HTMLInputElement>('import-file'),
   clearBtn: $('clear-btn'),
   toast: $('toast'),
+  toastText: $('toast-text'),
 };
 
 let archive: Article[] = [];
@@ -64,7 +69,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 let toastTimer: number | undefined;
 function toast(message: string): void {
-  els.toast.textContent = message;
+  els.toastText.textContent = message;
   els.toast.classList.add('show');
   window.clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => els.toast.classList.remove('show'), 2600);
@@ -80,20 +85,39 @@ function render(): void {
   const terms = parseQuery(filters.query);
 
   els.count.textContent = archive.length ? compactCount(archive.length) : '';
+  els.searchClear.hidden = !filters.query;
+
+  const unread = archive.filter((a) => !a.read).length;
+  if (!archive.length) {
+    els.resultsMeta.textContent = '';
+  } else if (filters.query || filters.unreadOnly) {
+    els.resultsMeta.textContent =
+      `${rows.length} of ${archive.length} articles` + (unread ? ` · ${unread} unread` : '');
+  } else {
+    els.resultsMeta.textContent =
+      `${archive.length} article${archive.length === 1 ? '' : 's'}` +
+      (unread ? ` · ${unread} unread` : ' · all caught up');
+  }
+
   els.list.replaceChildren();
 
   if (!rows.length) {
     const empty = el('div', 'empty');
-    empty.append(
-      el('strong', undefined, archive.length ? 'Nothing matches' : 'Nothing saved yet'),
-      el(
-        'span',
-        undefined,
-        archive.length
-          ? 'Try a different word, or clear the search.'
-          : 'Open an article and press Save this page. It stays readable with no connection.'
-      )
+    const art = el('div', 'empty-art', archive.length ? '🔍' : '📚');
+    art.setAttribute('aria-hidden', 'true');
+    const title = el(
+      'strong',
+      undefined,
+      archive.length ? 'Nothing matches' : 'Your offline library awaits'
     );
+    const hint = el('span');
+    if (archive.length) {
+      hint.textContent = 'Try a different word, or clear the search.';
+    } else {
+      hint.textContent =
+        'Open an article and press Save this page. It stays readable with no connection.';
+    }
+    empty.append(art, title, hint);
     els.list.append(empty);
     return;
   }
@@ -115,21 +139,29 @@ function render(): void {
 
 function card(article: Article, terms: readonly string[]): HTMLElement {
   const button = el('button', `card${article.read ? '' : ' unread'}`);
+  button.setAttribute('aria-label', `${article.title}${article.read ? '' : ', unread'}`);
   button.append(el('div', 'card-title', article.title));
 
   const meta = el('div', 'card-meta');
   meta.append(
-    el('span', undefined, article.site || 'saved page'),
-    el('span', undefined, '·'),
+    el('span', 'meta-site', article.site || 'saved page'),
     el('span', undefined, readingLabel(readingMinutes(article.wordCount)))
   );
   if (article.byline) {
-    meta.append(el('span', undefined, '·'), el('span', undefined, article.byline));
+    meta.append(el('span', undefined, `by ${article.byline}`));
   }
   button.append(meta);
 
   const excerpt = excerptFor(article, terms);
   if (excerpt) button.append(el('div', 'card-excerpt', excerpt));
+
+  if (article.progress > 0.02 && article.progress < 0.98) {
+    const bar = el('div', 'card-progress');
+    const fill = el('span');
+    fill.style.width = `${Math.round(article.progress * 100)}%`;
+    bar.append(fill);
+    button.append(bar);
+  }
 
   button.addEventListener('click', () => openReader(article));
   return button;
@@ -139,11 +171,19 @@ function openReader(article: Article): void {
   open = article;
   els.readerBody.replaceChildren();
 
-  els.readerBody.append(el('h1', undefined, article.title));
-  const meta = [article.site, article.byline, readingLabel(readingMinutes(article.wordCount))]
-    .filter(Boolean)
-    .join(' · ');
-  els.readerBody.append(el('div', 'reader-meta', meta));
+  const hero = el('div', 'reader-hero');
+  const kicker = el('div', 'reader-kicker');
+  kicker.append(
+    el('span', undefined, article.site || 'Saved page'),
+    el('span', 'kicker-dot', '·'),
+    el('span', undefined, readingLabel(readingMinutes(article.wordCount)))
+  );
+  hero.append(kicker);
+  hero.append(el('h1', undefined, article.title));
+  const metaBits = [article.byline, new Date(article.savedAt).toLocaleDateString()].filter(Boolean);
+  if (metaBits.length) hero.append(el('div', 'reader-meta', metaBits.join(' · ')));
+  els.readerBody.append(hero);
+
   for (const paragraph of article.paragraphs) {
     els.readerBody.append(el('p', undefined, paragraph));
   }
@@ -152,12 +192,21 @@ function openReader(article: Article): void {
   els.readToggle.textContent = article.read ? 'Mark unread' : 'Mark read';
   els.reader.hidden = false;
   els.readerBody.scrollTop = article.progress * els.readerBody.scrollHeight;
+  updateProgressBar();
   els.readerBody.focus();
 }
 
 function closeReader(): void {
+  if (open) void putArticle(open);
   open = null;
   els.reader.hidden = true;
+}
+
+function updateProgressBar(): void {
+  const { scrollTop, scrollHeight, clientHeight } = els.readerBody;
+  const max = scrollHeight - clientHeight;
+  const ratio = max > 0 ? Math.min(1, Math.max(0, scrollTop / max)) : 0;
+  els.readerProgress.style.width = `${Math.round(ratio * 100)}%`;
 }
 
 /** Remember roughly where the reader stopped, so reopening lands in place. */
@@ -166,6 +215,7 @@ function trackProgress(): void {
   const { scrollTop, scrollHeight, clientHeight } = els.readerBody;
   const max = scrollHeight - clientHeight;
   open.progress = max > 0 ? Math.min(1, scrollTop / max) : 0;
+  updateProgressBar();
   void putArticle(open);
 }
 
@@ -189,14 +239,20 @@ async function ensurePageAccess(): Promise<boolean> {
   }
 }
 
+function setSaveBusy(busy: boolean): void {
+  els.save.disabled = busy;
+  els.save.classList.toggle('is-busy', busy);
+  const label = els.save.querySelector('.primary-label');
+  if (label) label.textContent = busy ? 'Saving' : 'Save this page';
+}
+
 async function save(): Promise<void> {
   if (!(await ensurePageAccess())) {
     toast('Pagefold needs permission to read the page. You can also use Alt+Shift+S.');
     return;
   }
 
-  els.save.disabled = true;
-  els.save.textContent = 'Saving…';
+  setSaveBusy(true);
   try {
     const result = await chrome.runtime.sendMessage({ type: 'SAVE_ACTIVE_TAB' });
     if (result?.ok) {
@@ -208,15 +264,17 @@ async function save(): Promise<void> {
   } catch {
     toast('Could not reach the extension. Try reloading it.');
   } finally {
-    els.save.disabled = false;
-    els.save.textContent = 'Save this page';
+    setSaveBusy(false);
   }
 }
 
 async function showSettings(): Promise<void> {
   els.settings.hidden = false;
   const bytes = await usageBytes();
-  els.storageLine.textContent = `${archive.length} article${archive.length === 1 ? '' : 's'} saved, using about ${formatBytes(bytes)}.`;
+  els.storageLine.textContent = `${archive.length} article${archive.length === 1 ? '' : 's'} · about ${formatBytes(bytes)}`;
+  // 5 MB sync-style budget as a familiar yardstick; local storage is larger,
+  // but the bar still communicates growth at a glance.
+  els.storageMeter.style.width = `${Math.min(100, (bytes / (5 * 1024 * 1024)) * 100)}%`;
 }
 
 function download(name: string, text: string): void {
@@ -234,6 +292,12 @@ function wire(): void {
   els.search.addEventListener('input', () => {
     filters.query = els.search.value;
     render();
+  });
+  els.searchClear.addEventListener('click', () => {
+    els.search.value = '';
+    filters.query = '';
+    render();
+    els.search.focus();
   });
   els.sort.addEventListener('change', () => {
     filters.sort = els.sort.value as Filters['sort'];
@@ -304,9 +368,16 @@ function wire(): void {
   });
 
   document.addEventListener('keydown', (event) => {
+    const target = event.target as HTMLElement | null;
+    const typing =
+      target &&
+      (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT');
     if (event.key === 'Escape') {
       if (!els.settings.hidden) els.settings.hidden = true;
       else if (!els.reader.hidden) closeReader();
+    } else if (event.key === '/' && !typing && els.reader.hidden && els.settings.hidden) {
+      event.preventDefault();
+      els.search.focus();
     }
   });
 }
