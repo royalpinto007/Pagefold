@@ -66,8 +66,10 @@ device. Later, on a train or a plane or a hotel network that has given up, the
 side panel still opens and the article is still there.
 
 - **Reader view.** Just the article: no nav, no related-posts rail, no footer.
-- **Search.** Across titles, sites, authors and the full body text.
-- **Unread and progress.** It remembers how far down you were.
+- **Search.** Across titles, sites, authors and the full body text. Press `/`
+  to jump to it.
+- **Unread and progress.** It remembers how far down you were, with
+  per-article progress bars and a progress rail in the reader.
 - **Backup.** Export to a JSON file, import it back on another machine.
 
 ## Why it exists

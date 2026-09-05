@@ -1,6 +1,6 @@
 {
   "name": "pagefold",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Save any article and read it offline. No account, no sync, no network.",
   "scripts": {

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-06
+
+### Added
+
+- Redesigned side panel: blurred sticky header with an article count pill,
+  gradient save button with a busy spinner, and icon search with a clear
+  button.
+- Results line showing how many articles match, an unread pill toggle, and a
+  `/` keyboard shortcut that focuses search.
+- Reader hero with site and reading-time kicker, a reading progress rail, and
+  a drop cap on the first paragraph.
+- Per-article progress bars in the list and a storage meter in settings.
+
 ## [1.0.0]
 
 Initial release.
